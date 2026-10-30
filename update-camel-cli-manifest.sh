@@ -15,7 +15,8 @@
 #    Always advances <X.Y>.properties (the newest patch of the release line) and,
 #    when content/releases/release-<version>.md has `kind: lts`, lts.properties.
 #    Both only move forward: a patch on an older LTS line leaves lts.properties
-#    alone. The release page must exist and must not be a draft.
+#    alone. The release page must exist, must not be a draft and must not be
+#    dated in the future.
 # 4. Checks that every alias matches the exact-version manifests
 #    (scripts/camel-cli-aliases.sh check, also run in CI).
 #
@@ -66,7 +67,7 @@ if [ -n "${CAMEL_INSTALL_SRC_DIR:-}" ]; then
     [ -d "$CAMEL_INSTALL_SRC_DIR" ] || die "CAMEL_INSTALL_SRC_DIR not found: $CAMEL_INSTALL_SRC_DIR"
 fi
 
-# Fails if the release page is missing, a draft, or not a Camel release.
+# Fails if the release page is missing, a draft, future-dated, or not a Camel release.
 kind=$("$repo_root/scripts/camel-cli-aliases.sh" kind "$version") || exit 1
 if [ "$kind" = "lts" ]; then lts=true; else lts=false; fi
 echo "Release $version is $kind (content/releases/release-$version.md)"

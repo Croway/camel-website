@@ -42,7 +42,7 @@ then run it. The same approach lets you pin an exact `X.Y.Z` version.
 ```bash
 curl -fsSL https://camel.apache.org/install.sh -o install.sh
 less install.sh
-sh install.sh --version 4.21.0
+sh install.sh --version 4.22.2
 ```
 
 ### Windows (PowerShell)
@@ -50,7 +50,7 @@ sh install.sh --version 4.21.0
 ```powershell
 irm https://camel.apache.org/install.ps1 -OutFile install.ps1
 notepad install.ps1
-./install.ps1 -Version 4.21.0
+./install.ps1 -Version 4.22.2
 ```
 
 ## How the security works

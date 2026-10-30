@@ -26,8 +26,9 @@
 # The LTS versions come from the release pages: a release is LTS when
 # content/releases/release-<version>.md has `kind: lts` in its front matter.
 # Every exact-version manifest (X.Y.Z.properties) must have a published
-# (`draft: false`, `category: camel`) release page. The alias rules themselves
-# live in the vendored scripts/WebsiteManifestGenerator.java (--rebuild-aliases).
+# (`draft: false`, not future-dated, `category: camel`) release page. The
+# alias rules themselves live in the vendored
+# scripts/WebsiteManifestGenerator.java (--rebuild-aliases).
 set -eu
 
 repo_root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
@@ -55,12 +56,18 @@ front_matter_value() {
 }
 
 # Prints "lts" or "regular" for a published Camel release; fails if its release
-# page is missing, is a draft, or is not a Camel release.
+# page is missing, is a draft, is dated in the future, or is not a Camel release.
 release_kind() {
     page="$pages_dir/release-$1.md"
     [ -f "$page" ] || die "release page not found for $1: content/releases/release-$1.md"
     [ "$(front_matter_value "$page" draft)" != "true" ] \
         || die "release page for $1 is a draft: content/releases/release-$1.md"
+    release_date=$(front_matter_value "$page" date | cut -c1-10)
+    echo "$release_date" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' \
+        || die "release page for $1 has no valid date (expected YYYY-MM-DD): content/releases/release-$1.md"
+    # Hugo reads front matter dates as UTC and does not publish future-dated pages.
+    [ "$(echo "$release_date" | tr -d -)" -le "$(date -u +%Y%m%d)" ] \
+        || die "release page for $1 is dated in the future ($release_date): content/releases/release-$1.md"
     category=$(front_matter_value "$page" category)
     [ "$category" = "camel" ] \
         || die "release page for $1 has category '$category', expected 'camel': content/releases/release-$1.md"
